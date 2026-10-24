@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="zh-CN" translate="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="google" content="notranslate" />
+    <title>AutoLogic Studio</title>
+    <link rel="preload" as="image" href="./assets/autologic-entry-cover-16x9-4k.png?v=20260909a" fetchpriority="high" />
+    <link rel="stylesheet" href="./styles.css?v=20260927-multi-provider-v1" />
+  </head>
+  <body class="landing-active">
+    <section id="landingCover" class="landing-cover" aria-label="AutoLogic Studio entry cover">
+      <button id="enterStudioButton" class="landing-cover-trigger" type="button" aria-label="Enter AutoLogic Studio">
+        <img
+          class="landing-cover-art"
+          src="./assets/autologic-entry-cover-16x9-4k.png?v=20260909a"
+          alt="AutoLogic Studio. Logic-Driven Document Generation. From Documents to Insights."
+          decoding="sync"
+          fetchpriority="high"
+          loading="eager"
+        />
+        <span class="landing-enter-prompt">
+          <strong>Enter AutoLogic Studio</strong>
+          <small>进入系统</small>
+          <b aria-hidden="true">→</b>
+        </span>
+      </button>
+    </section>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <img class="brand-mark" src="./assets/autologic-studio-mark-light.png?v=20260802a" width="44" height="44" alt="" aria-hidden="true" />
+          <div class="brand-copy">
+            <strong>AutoLogic</strong>
+            <span>Writing Intelligence</span>
+          </div>
+        </div>
+
+        <button id="languageToggleButton" class="language-toggle-button" type="button" aria-label="切换国际版">
+          <span aria-hidden="true">◎</span>
+          <strong>International</strong>
+          <small>English</small>
+        </button>
+
+        <button id="newChatButton" class="new-task-button" type="button">
+          <span aria-hidden="true">＋</span>
+          新建任务
+        </button>
+
+        <button id="offlineDfaButton" class="offline-dfa-button" type="button">
+          <span aria-hidden="true">◇</span>
+          查看全局写作 DFA
+        </button>
+
+        <button id="myDfaButton" class="my-dfa-button" type="button">
+          <span aria-hidden="true">✦</span>
+          我的 DFA
+        </button>
+
+        <button id="uploadDfaButton" class="upload-dfa-button" type="button">
+          <span aria-hidden="true">⇧</span>
+          上传模板构建
+        </button>
+
+        <button id="apiSettingsButton" class="api-settings-button" type="button">
+          <span aria-hidden="true">⌁</span>
+          API 配置
+          <i id="apiSettingsIndicator" aria-label="API 配置状态"></i>
+        </button>
+
+        <section class="sidebar-section history-section">
+          <div class="section-label">
+            <span>最近任务</span>
+            <span id="historyCount">0</span>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </section>
+
+        <div class="sidebar-spacer"></div>
+
+        <details class="config-panel">
+          <summary>
+            <span>运行配置</span>
+            <span aria-hidden="true">⌄</span>
+          </summary>
+          <div class="config-body">
+            <label class="field-label">
+              <span>报告领域</span>
+              <select id="domainSelect">
+                <option value="">自动识别</option>
+                <option value="precious_metals">贵金属 / 有色</option>
+                <option value="etf">ETF</option>
+                <option value="macro">宏观</option>
+                <option value="cotton">棉花</option>
+                <option value="agriculture">农产品</option>
+              </select>
+            </label>
+
+            <label class="field-label range-field">
+              <span>写作模式频率阈值 θ <strong id="thetaValue">0.50</strong></span>
+              <input id="thetaInput" type="range" min="0.10" max="0.95" step="0.01" value="0.50" />
+            </label>
+
+            <details class="advanced-config">
+              <summary>高级参数</summary>
+              <div class="advanced-grid">
+                <label class="field-label range-field">
+                  <span>状态匹配阈值 τ <strong id="tauValue">0.20</strong></span>
+                  <input id="tauInput" type="range" min="0.05" max="0.85" step="0.01" value="0.20" />
+                </label>
+                <label class="field-label">
+                  <span>Fallback top-k</span>
+                  <input id="fallbackTopKInput" type="number" min="1" max="8" step="1" value="3" />
+                </label>
+              </div>
+            </details>
+
+            <label class="field-label data-source-field">
+              <span>市场证据源</span>
+              <select id="dataSourceSelect">
+                <option value="auto">自动选择（AkShare + Tushare）</option>
+                <option value="akshare">AkShare</option>
+                <option value="tushare">Tushare</option>
+                <option value="ifind">iFinD</option>
+                <option value="demo">离线演示</option>
+              </select>
+            </label>
+
+            <div class="toggle-stack">
+              <label class="toggle-row">
+                <span>语义 Embedding</span>
+                <input id="remoteEmbeddingInput" type="checkbox" />
+              </label>
+              <label class="toggle-row">
+                <span>重新诱导全局写作 DFA</span>
+                <input id="sourceLearningInput" type="checkbox" />
+              </label>
+              <label class="toggle-row">
+                <span>忽略本地全局写作 DFA 缓存</span>
+                <input id="forceRelearnInput" type="checkbox" />
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <div class="runtime-summary">
+          <div class="runtime-heading">
+            <span id="runtimeDot" class="runtime-dot"></span>
+            <strong id="runtimeStatus">正在检查服务</strong>
+          </div>
+          <dl>
+            <div><dt>DFA</dt><dd id="dfaRuntime">等待任务</dd></div>
+            <div><dt>证据源</dt><dd id="evidenceRuntime">本地材料</dd></div>
+            <div><dt>模型</dt><dd id="modelRuntime">-</dd></div>
+          </dl>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="topbar-title">
+            <p>Logic-Driven Document Generation</p>
+            <h1>证据驱动报告工作台</h1>
+          </div>
+          <div class="topbar-status">
+            <span class="method-badge"><i></i> AutoLogic · LDP</span>
+            <span id="apiStatus" class="api-status">连接中</span>
+          </div>
+        </header>
+
+        <aside id="pagesDemoBanner" class="pages-demo-banner" hidden aria-live="polite">
+          <div>
+            <strong>GitHub Pages 在线交互演示版</strong>
+            <span>可直接体验全局写作 DFA、状态匹配、Query-Specific Sub-DFA 与报告组装；模板构建记录保存在当前浏览器数据库中，实时市场数据与 AI 结论需要部署 Python 后端。</span>
+          </div>
+          <nav aria-label="Showcase links">
+            <a href="./video.html">Watch Demo Video</a>
+            <span role="note">Demo Link (address omitted for privacy)</span>
+          </nav>
+        </aside>
+
+        <section id="conversationScroll" class="conversation-scroll">
+          <section id="emptyState" class="empty-state">
+            <img class="empty-mark" src="./assets/autologic-studio-mark-light.png?v=20260802a" alt="" aria-hidden="true" />
+            <p class="empty-kicker">AutoLogic Studio</p>
+            <h2>让证据决定报告的下一步</h2>
+            <div class="method-flow" aria-label="AutoLogic 方法流程">
+              <span><b>01</b> 全局写作 DFA</span>
+              <i aria-hidden="true">→</i>
+              <span><b>02</b> 对话解析</span>
+              <i aria-hidden="true">→</i>
+              <span><b>03</b> 状态匹配</span>
+              <i aria-hidden="true">→</i>
+              <span><b>04</b> Query-Specific Sub-DFA</span>
+              <i aria-hidden="true">→</i>
+              <span><b>05</b> 数据证据</span>
+              <i aria-hidden="true">→</i>
+              <span><b>06</b> 报告生成</span>
+            </div>
+            <div class="example-grid">
+              <button type="button" data-prompt="请为投资研究读者生成一篇黄金及相关贵金属周度分析，解释指定时间内的市场变化，以及这些变化对投资仓位和下行风险的影响。请由系统依据历史写作逻辑与可用证据决定报告结构。" data-scope="黄金现货、COMEX 黄金与中国市场，兼顾白银及相关有色品种。" data-time-preset="complete-week" data-domain="precious_metals" data-fallback-top-k="5">
+                <span>黄金周报</span>
+                <small>多状态 · 深度周报</small>
+              </button>
+              <button type="button" data-prompt="请为投资研究读者生成一篇有色金属行业跟踪报告，判断指定时间内产业链与市场环境的主要变化，并说明这些变化对配置决策和下行风险的影响。请由系统依据历史写作逻辑与可用证据决定报告结构。" data-scope="铜、铝产业链，兼顾贵金属、小金属和新能源金属。" data-time-preset="complete-week" data-domain="precious_metals" data-fallback-top-k="5">
+                <span>有色金属跟踪</span>
+                <small>多状态 · 铜铝供需</small>
+              </button>
+              <button type="button" data-prompt="请为投资研究读者生成一篇宏观专题报告，判断指定时间内宏观环境的主要变化，以及这些变化对增长预期、大宗商品配置和下行风险的影响。请由系统依据历史写作逻辑与可用证据决定报告结构。" data-scope="全球宏观变量与中国经济，关注对大宗商品的影响。" data-time-preset="complete-data-month" data-domain="macro" data-fallback-top-k="7">
+                <span>宏观专题</span>
+                <small>全链路 · 宏观专题</small>
+              </button>
+            </div>
+          </section>
+
+          <div id="pastMessages" class="past-messages"></div>
+
+          <section id="currentTurn" class="current-turn turn-hidden">
+            <div class="user-message-row">
+              <div class="user-bubble">
+                <span>你的问题</span>
+                <p id="queryEcho"></p>
+              </div>
+              <div class="user-avatar" aria-hidden="true">你</div>
+            </div>
+
+            <div class="assistant-message-row">
+              <img class="assistant-avatar" src="./assets/autologic-studio-mark-light.png?v=20260802a" alt="" aria-hidden="true" />
+              <article class="assistant-response">
+                <header class="run-header">
+                  <div>
+                    <div class="run-title-line">
+                      <h2 id="runTitle">正在准备 AutoLogic</h2>
+                      <span id="runBadge" class="run-badge running">运行中</span>
+                    </div>
+                    <p id="runSubtitle">正在载入离线全局写作 DFA</p>
+                  </div>
+                  <button id="skipAnimationButton" class="icon-text-button" type="button" title="跳到最终结果">跳到结果</button>
+                </header>
+
+                <div id="stageRail" class="stage-rail">
+                  <button type="button" data-stage="dfa"><b>01</b><span>全局写作 DFA</span></button>
+                  <button type="button" data-stage="query"><b>02</b><span>对话解析</span></button>
+                  <button type="button" data-stage="match"><b>03</b><span>状态匹配</span></button>
+                  <button type="button" data-stage="subdfa"><b>04</b><span>Query-Specific Sub-DFA</span></button>
+                  <button type="button" data-stage="evidence"><b>05</b><span>数据与证据</span></button>
+                  <button type="button" data-stage="assembly"><b>06</b><span>报告生成</span></button>
+                </div>
+
+                <div class="result-layout">
+                  <section class="report-pane">
+                    <div class="pane-heading report-heading">
+                      <div>
+                        <span id="primaryKicker" class="pane-kicker">Primary Output</span>
+                        <h3 id="primaryTitle">生成报告</h3>
+                      </div>
+                      <div class="report-actions">
+                        <span id="reportProgress">等待生成</span>
+                        <button id="copyReportButton" class="icon-button" type="button" title="复制报告" aria-label="复制报告">⧉</button>
+                        <button id="downloadReportButton" class="icon-button" type="button" title="下载 Markdown 报告" aria-label="下载 Markdown 报告">⇩</button>
+                      </div>
+                    </div>
+                    <div id="reportMeta" class="report-meta"></div>
+                    <div id="reportPreview" class="report-preview is-loading">
+                      <div class="loading-lines"><i></i><i></i><i></i><i></i></div>
+                    </div>
+                  </section>
+
+                  <aside class="execution-pane">
+                    <div class="pane-heading">
+                      <div>
+                        <span class="pane-kicker">Online Execution</span>
+                        <h3>Query-Specific Sub-DFA 与执行轨迹</h3>
+                      </div>
+                      <span id="traceCounter" class="trace-counter">0 / 0</span>
+                    </div>
+
+                    <div class="graph-toolbar">
+                      <div class="graph-view-tabs" role="tablist" aria-label="执行视图">
+                        <button class="active" type="button" data-view="construction">动态构建</button>
+                        <button type="button" data-view="dfa">全局写作 DFA</button>
+                      </div>
+                      <div class="graph-inspection-tools" aria-label="DFA inspection controls">
+                        <div class="graph-layout-tabs" role="group" aria-label="DFA layout">
+                          <button class="active" type="button" data-graph-layout="auto" title="Use the original DFA layout">Auto</button>
+                          <button type="button" data-graph-layout="horizontal" title="Arrange the DFA horizontally">H</button>
+                          <button type="button" data-graph-layout="vertical" title="Arrange the DFA vertically">V</button>
+                        </div>
+                        <button id="graphZoomOutButton" type="button" title="缩小 DFA" aria-label="缩小 DFA">−</button>
+                        <strong id="graphZoomLabel" aria-live="polite">100%</strong>
+                        <button id="graphZoomInButton" type="button" title="放大 DFA" aria-label="放大 DFA">＋</button>
+                        <button id="graphFitButton" type="button" title="Fit the DFA to the viewport">Fit</button>
+                        <button id="graphExpandButton" class="graph-expand-button" type="button" title="放大查看 Query-Specific Sub-DFA" aria-label="放大查看 Query-Specific Sub-DFA">⛶</button>
+                      </div>
+                    </div>
+                    <div id="graphSummary" class="graph-summary">等待 Query-Specific Sub-DFA 构建</div>
+                    <div id="graphShell" class="graph-shell">
+                      <svg id="dfaSvg" viewBox="0 0 720 420" role="img" aria-label="Query-Specific Sub-DFA"></svg>
+                    </div>
+
+                    <section class="decision-panel">
+                      <div class="decision-state">
+                        <span id="decisionIndex">S0</span>
+                        <div>
+                          <small id="decisionContextLabel">当前构建对象</small>
+                          <strong id="decisionTitle">等待执行</strong>
+                        </div>
+                      </div>
+                      <div class="decision-body">
+                        <div>
+                          <span id="evidenceLabel" class="decision-label">构建依据</span>
+                          <p id="evidenceText">尚未检索证据</p>
+                        </div>
+                        <div>
+                          <span id="conditionLabel" class="decision-label">当前产出</span>
+                          <p id="conditionText">等待条件判定</p>
+                        </div>
+                      </div>
+                    </section>
+
+                    <div id="eventTimeline" class="event-timeline"></div>
+                  </aside>
+                </div>
+
+                <details class="run-detail">
+                  <summary>运行明细与数据来源</summary>
+                  <div id="runDetailGrid" class="run-detail-grid"></div>
+                </details>
+              </article>
+            </div>
+            <div id="revisionThread" class="revision-thread" aria-live="polite"></div>
+          </section>
+        </section>
+
+        <footer class="composer-shell">
+          <div id="mainComposer" class="composer">
+            <div id="composerFields" class="composer-fields">
+              <label><span>需求范围</span><input id="scopeInput" type="text" placeholder="如：黄金现货、COMEX 与国内市场" /></label>
+              <label class="time-range-field">
+                <span>时间范围</span>
+                <div class="time-range-control">
+                  <input id="timeRangeInput" type="text" autocomplete="off" placeholder="如：2025-06-02 至 2025-06-08" />
+                  <select id="timeRangePresetSelect" aria-label="选择时间示例"><option value="">选择示例</option></select>
+                </div>
+              </label>
+              <label class="state-constraints-field">
+                <span>写作状态约束（可选）</span>
+                <input id="stateConstraintsInput" type="text" autocomplete="off" placeholder="如：风险提示；留空则由 DFA 根据查询与证据选择 writing states" />
+              </label>
+            </div>
+            <textarea id="queryInput" rows="1" spellcheck="false" placeholder="输入报告主题、目标读者和关注重点"></textarea>
+            <div class="composer-footer">
+              <div class="composer-options">
+                <button id="modeButton" type="button" title="当前运行模式"><span></span> 证据驱动</button>
+                <button id="composerApiSettingsButton" class="composer-api-settings-button" type="button" title="配置模型与数据源 API">
+                  <span aria-hidden="true">⌁</span>
+                  API 配置
+                </button>
+                <details id="reportLengthControl" class="report-length-control">
+                  <summary aria-label="设置报告篇幅">
+                    <span aria-hidden="true">≡</span>
+                    <strong>篇幅 · <b id="reportLengthLabel">标准</b></strong>
+                    <small id="reportLengthMeta">1800–2500 字</small>
+                  </summary>
+                  <div class="report-length-popover">
+                    <header>
+                      <strong>报告篇幅</strong>
+                      <small>总字数会按实际写作状态数量动态分配到各段。</small>
+                    </header>
+                    <div class="threshold-preset-grid compact report-length-grid" role="group" aria-label="选择报告篇幅">
+                      <button type="button" data-report-length="concise"><strong>精简</strong><span>800–1200 字</span></button>
+                      <button type="button" data-report-length="standard" class="active" aria-pressed="true"><strong>标准</strong><span>1800–2500 字</span></button>
+                      <button type="button" data-report-length="detailed"><strong>详细</strong><span>3500–5000 字</span></button>
+                    </div>
+                    <p id="reportLengthHint">适合完整研究报告，兼顾分析深度与阅读效率。</p>
+                  </div>
+                </details>
+                <details id="composerDfaSourceControl" class="composer-dfa-source-control">
+                  <summary aria-label="选择生成报告使用的 DFA">
+                    <span aria-hidden="true">✦</span>
+                    <strong>结构 · <b id="composerDfaSourceLabel">系统写作 DFA</b></strong>
+                    <small id="composerDfaSourceMeta">按垂类自动选择</small>
+                  </summary>
+                  <div class="composer-dfa-source-popover">
+                    <header>
+                      <strong>本次生成使用的 DFA</strong>
+                      <small>系统 DFA 或你保存的自定义 DFA，将用于构建本次 Query-Specific Sub-DFA。</small>
+                    </header>
+                    <label>
+                      <span>DFA 来源</span>
+                      <select id="composerDfaSelect" aria-label="选择生成使用的 DFA">
+                        <option value="system">系统写作 DFA · 按垂类自动选择</option>
+                      </select>
+                    </label>
+                    <div id="composerDfaSourceHint" class="composer-dfa-source-hint">当前将使用系统诱导得到的全局写作 DFA。</div>
+                    <div class="composer-dfa-source-actions">
+                      <button id="manageComposerDfaButton" type="button">手动构建 / 编辑</button>
+                      <button id="uploadComposerDfaButton" type="button">上传模板自动构建</button>
+                    </div>
+                  </div>
+                </details>
+                <details id="composerThresholdControl" class="composer-threshold-control">
+                  <summary aria-label="设置 DFA 状态覆盖范围">
+                    <span aria-hidden="true">◇</span>
+                    <strong>DFA · <b id="thresholdPresetButtonLabel">均衡</b></strong>
+                    <small id="thresholdPresetButtonMeta">θ 0.50 · τ 0.20 · Top-3</small>
+                  </summary>
+                  <div class="composer-threshold-popover">
+                    <header>
+                      <strong id="thresholdPresetLabel">DFA 状态覆盖范围</strong>
+                      <small id="thresholdPresetSummary">均衡 · 兼顾核心与覆盖 · θ 0.50 / τ 0.20 / Top-3</small>
+                    </header>
+                    <div class="threshold-preset-grid compact" role="group" aria-label="选择 DFA 状态覆盖范围">
+                      <button type="button" data-threshold-preset="core"><strong>核心</strong><span>θ .70 · τ .45 · Top-2</span></button>
+                      <button type="button" data-threshold-preset="balanced" class="active" aria-pressed="true"><strong>均衡</strong><span>θ .50 · τ .20 · Top-3</span></button>
+                      <button type="button" data-threshold-preset="comprehensive"><strong>全面</strong><span>θ .30 · τ .10 · Top-8</span></button>
+                    </div>
+                    <div class="composer-threshold-sliders">
+                      <label>
+                        <span>频率阈值 θ <strong id="composerThetaValue">0.50</strong></span>
+                        <input id="composerThetaInput" type="range" min="0.10" max="0.95" step="0.01" value="0.50" />
+                      </label>
+                      <label>
+                        <span>匹配阈值 τ <strong id="composerTauValue">0.20</strong></span>
+                        <input id="composerTauInput" type="range" min="0.05" max="0.85" step="0.01" value="0.20" />
+                      </label>
+                      <label class="composer-top-k-field">
+                        <span>Top-K</span>
+                        <input id="composerFallbackTopKInput" type="number" min="1" max="8" step="1" value="3" />
+                      </label>
+                    </div>
+                  </div>
+                </details>
+                <span>Enter 发送 · Shift+Enter 换行</span>
+              </div>
+              <button id="composerRunButton" class="send-button" type="button" title="发送并生成报告" aria-label="发送并生成报告">↑</button>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <dialog id="apiSettingsDialog" class="api-settings-dialog">
+      <header>
+        <div>
+          <span class="pane-kicker">Service Credentials</span>
+          <h2>API 配置</h2>
+          <p>密钥只提交给本机后端并保存到私有配置文件；已保存的完整密钥不会返回浏览器。</p>
+        </div>
+        <button id="closeApiSettingsButton" class="icon-button" type="button" title="关闭" aria-label="关闭 API 配置">×</button>
+      </header>
+
+      <form id="apiSettingsForm" autocomplete="off">
+        <div id="apiSettingsMessage" class="api-settings-message" role="status" aria-live="polite">
+          正在读取当前配置……
+        </div>
+
+        <section id="apiAdminSection" class="api-settings-admin" hidden>
+          <label>
+            <span>服务器配置管理令牌</span>
+            <input id="apiAdminTokenInput" type="password" autocomplete="off" placeholder="填写 SUBDFA_CONFIG_ADMIN_TOKEN" />
+          </label>
+          <small>服务器部署必须验证管理令牌；令牌仅用于本次保存，不写入浏览器存储。</small>
+        </section>
+
+        <div class="api-settings-grid">
+          <section class="api-settings-card api-settings-card-wide">
+            <header>
+              <div><span>01</span><strong>正文生成模型</strong></div>
+              <em id="generationConfigStatus">未检查</em>
+            </header>
+            <div class="api-provider-toolbar">
+              <label><span>当前启用的生成模型</span>
+                <select id="generationActiveProviderSelect">
+                  <option value="deepseek">DeepSeek</option>
+                  <option value="openai">GPT / OpenAI</option>
+                  <option value="kimi">Kimi / Moonshot</option>
+                  <option value="doubao">豆包 / Volcengine</option>
+                  <option value="custom">自定义兼容接口</option>
+                </select>
+              </label>
+              <p>可以同时保存多套配置；下拉框决定生成报告时实际使用哪一套。</p>
+            </div>
+            <div id="generationProviderProfiles" class="api-provider-list"></div>
+          </section>
+
+          <section class="api-settings-card api-settings-card-wide">
+            <header>
+              <div><span>02</span><strong>语义 Embedding</strong></div>
+              <em id="embeddingConfigStatus">未检查</em>
+            </header>
+            <div class="api-provider-toolbar">
+              <label><span>当前启用的语义模型</span>
+                <select id="embeddingActiveProviderSelect">
+                  <option value="dashscope">阿里云百炼 / DashScope</option>
+                  <option value="openai">OpenAI Embedding</option>
+                  <option value="doubao">豆包 Embedding</option>
+                  <option value="zhipu">智谱 Embedding</option>
+                  <option value="custom">自定义兼容接口</option>
+                </select>
+              </label>
+              <p>语义模型用于查询与写作状态匹配；关闭“远程语义嵌入”时仍使用本地哈希表示。</p>
+            </div>
+            <div id="embeddingProviderProfiles" class="api-provider-list"></div>
+          </section>
+
+          <section class="api-settings-card api-settings-card-wide">
+            <header>
+              <div><span>03</span><strong>市场数据接口</strong></div>
+              <em id="marketConfigStatus">未检查</em>
+            </header>
+            <div class="api-provider-toolbar">
+              <label><span>默认证据源</span>
+                <select id="evidenceActiveSourceSelect">
+                  <option value="auto">自动选择（AkShare + Tushare）</option>
+                  <option value="akshare">AkShare</option>
+                  <option value="tushare">Tushare</option>
+                  <option value="ifind">iFinD</option>
+                  <option value="none">不调用市场数据</option>
+                </select>
+              </label>
+              <p>这里设置交付后的默认值；每次生成仍可在运行配置中临时切换。</p>
+            </div>
+            <div class="api-market-grid">
+              <div>
+                <h3>AkShare</h3>
+                <label class="api-enable-row"><span>启用 AkShare</span><input id="akshareEnabledInput" type="checkbox" checked /></label>
+                <p id="akshareStatusText">AkShare 无需 API Key，安装依赖后即可直接检索公开市场数据。</p>
+              </div>
+              <div>
+                <h3>Tushare</h3>
+                <label><span>Token</span><input id="tushareTokenInput" type="password" autocomplete="new-password" placeholder="留空则保持现有 Token" /></label>
+                <label class="api-clear-row"><input id="clearTushareTokenInput" type="checkbox" /><span>清除已保存的 Tushare Token</span></label>
+              </div>
+              <div>
+                <h3>iFinD</h3>
+                <label class="api-enable-row"><span>启用 iFinD</span><input id="ifindEnabledInput" type="checkbox" /></label>
+                <label><span>用户名</span><input id="ifindUsernameInput" type="text" maxlength="200" autocomplete="off" /></label>
+                <label><span>密码</span><input id="ifindPasswordInput" type="password" autocomplete="new-password" placeholder="留空则保持现有密码" /></label>
+                <label class="api-clear-row"><input id="clearIfindCredentialsInput" type="checkbox" /><span>清除已保存的 iFinD 账号和密码</span></label>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="api-settings-note">
+          <strong>安全提示</strong>
+          <span>不要使用他人的密钥。服务器部署时请通过 HTTPS 访问，并设置高强度的 SUBDFA_CONFIG_ADMIN_TOKEN。</span>
+        </div>
+        <footer>
+          <button id="cancelApiSettingsButton" type="button">取消</button>
+          <button id="saveApiSettingsButton" class="primary" type="submit">保存并立即应用</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="offlineDfaModal" class="offline-dfa-modal">
+      <header>
+        <div>
+          <span class="pane-kicker">Offline Writing Automaton</span>
+          <h2>离线全局写作 DFA</h2>
+          <p id="offlineDfaSummary">读取本地已诱导的写作结构。</p>
+        </div>
+        <button id="closeOfflineDfaButton" class="icon-button" type="button" title="关闭" aria-label="关闭">×</button>
+      </header>
+      <div class="offline-dfa-controls">
+        <label>报告领域 <select id="offlineDfaDomainSelect"><option value="precious_metals">贵金属 / 有色</option><option value="etf">ETF</option><option value="macro">宏观</option><option value="cotton">棉花</option><option value="agriculture">农产品</option></select></label>
+        <button id="refreshOfflineDfaButton" type="button">切换结构</button>
+        <div class="offline-dfa-view-controls" role="group" aria-label="DFA 显示控制">
+          <button id="offlineDfaZoomOutButton" type="button" title="缩小 DFA" aria-label="缩小 DFA">−</button>
+          <strong id="offlineDfaZoomLabel" aria-live="polite">100%</strong>
+          <button id="offlineDfaZoomInButton" type="button" title="放大 DFA" aria-label="放大 DFA">＋</button>
+          <button id="offlineDfaFitButton" type="button">适应窗口</button>
+          <button id="offlineDfaFocusButton" type="button">放大画布</button>
+        </div>
+      </div>
+      <div id="offlineDfaMetrics" class="offline-dfa-metrics"></div>
+      <div class="offline-dfa-workspace">
+        <div class="offline-dfa-canvas">
+          <div id="offlineDfaViewport" class="offline-dfa-viewport">
+            <svg id="offlineDfaSvg" viewBox="0 0 1320 600" role="img" aria-label="离线全局写作 DFA"></svg>
+          </div>
+        </div>
+        <aside id="offlineDfaDetail" class="offline-dfa-detail" aria-live="polite">
+          <div class="offline-detail-empty"><strong>选择一个段落节点</strong><p>点击左侧节点，查看该段落的执行轨迹。</p></div>
+        </aside>
+      </div>
+      <p class="offline-dfa-note">该 DFA 来自本机缓存的全局写作 DFA；本窗口不会调用市场数据或生成报告。</p>
+    </dialog>
+
+    <dialog id="uploadDfaModal" class="upload-dfa-modal">
+      <header>
+        <div>
+          <span class="pane-kicker">Template-to-DFA Builder</span>
+          <h2>上传模板自动构建 DFA</h2>
+          <p id="uploadDfaSummary">上传多份同类报告或模板，系统将抽取状态、对齐语义并归纳稳定转移。</p>
+        </div>
+        <button id="closeUploadDfaButton" class="icon-button" type="button" title="关闭" aria-label="关闭模板构建器">×</button>
+      </header>
+
+      <div class="upload-dfa-layout">
+        <section class="upload-builder-panel">
+          <div class="upload-builder-heading">
+            <div><span>01</span><strong>准备构建材料</strong></div>
+            <small>建议上传 2–10 份同领域、同报告类型的样本</small>
+          </div>
+          <div class="upload-builder-fields">
+            <label><span>DFA 名称</span><input id="uploadDfaNameInput" name="demo_dfa_name" type="text" maxlength="120" autocomplete="off" placeholder="如：贵金属周报 DFA" /></label>
+            <label><span>模板分类</span><input id="uploadDfaCategoryInput" name="demo_template_category" type="text" maxlength="80" autocomplete="off" list="templateCategorySuggestions" placeholder="如：周报 / 策略报告" /></label>
+            <datalist id="templateCategorySuggestions"><option value="周报模板"></option><option value="月报模板"></option><option value="专题报告"></option><option value="策略报告"></option><option value="行业跟踪"></option></datalist>
+            <label><span>报告领域</span><select id="uploadDfaDomainSelect"><option value="auto">自动识别</option><option value="precious_metals">贵金属 / 有色</option><option value="etf">ETF</option><option value="macro">宏观</option><option value="cotton">棉花</option><option value="agriculture">农产品</option></select></label>
+            <label class="upload-threshold-field"><span>稳定模式阈值 θ <strong id="uploadDfaThetaValue">0.30</strong></span><input id="uploadDfaThetaInput" type="range" min="0.05" max="0.90" step="0.05" value="0.30" /><small>样本少时建议 0.20–0.35；样本多时可提高阈值过滤偶然结构。</small></label>
+          </div>
+
+          <label id="uploadDfaDropzone" class="upload-dropzone" tabindex="0">
+            <input id="uploadDfaFileInput" type="file" multiple accept=".txt,.md,.csv,.json,.html,.htm,.docx,.pptx,.xlsx,.pdf" />
+            <span aria-hidden="true">⇧</span>
+            <strong>选择文件或拖到这里</strong>
+            <p>支持 TXT、Markdown、CSV、JSON、HTML、Word、PPT、Excel 和 PDF</p>
+            <small>单文件不超过 10 MB，一次最多 20 个；扫描版 PDF 请先进行 OCR。</small>
+          </label>
+          <div id="uploadDfaFileList" class="upload-file-list"><div class="upload-file-empty">尚未选择模板文件</div></div>
+          <div class="upload-guidance">
+            <strong>怎样获得更稳定的 DFA？</strong>
+            <ul><li>尽量上传同领域、同机构或同报告类型的模板。</li><li>保留章节标题和段落顺序，系统会据此识别写作状态。</li><li>至少两份样本有助于区分稳定结构与偶然段落。</li></ul>
+          </div>
+          <button id="startUploadDfaBuildButton" class="upload-build-button" type="button">开始构建 DFA</button>
+
+          <section id="uploadDfaProgress" class="upload-progress" hidden aria-live="polite">
+            <header><div><span id="uploadDfaProgressStage">等待开始</span><strong id="uploadDfaProgressPercent">0%</strong></div><p id="uploadDfaProgressMessage">正在准备构建任务。</p></header>
+            <div class="upload-progress-track"><i id="uploadDfaProgressBar"></i></div>
+            <div id="uploadDfaProgressSteps" class="upload-progress-steps">
+              <span data-build-stage="extracting">文件解析</span><span data-build-stage="classifying">领域识别</span><span data-build-stage="aligning">状态对齐</span><span data-build-stage="inducing">转移归纳</span><span data-build-stage="saving">分类保存</span>
+            </div>
+            <div id="uploadDfaProgressLog" class="upload-progress-log"></div>
+          </section>
+        </section>
+
+        <section class="upload-library-panel">
+          <div class="upload-builder-heading">
+            <div><span>02</span><strong>模板 DFA 库</strong></div>
+            <small id="uploadDfaLibraryCount">0 个已构建 DFA</small>
+          </div>
+          <div class="upload-library-toolbar">
+            <label><span>领域</span><select id="uploadDfaLibraryDomain"><option value="all">全部领域</option><option value="precious_metals">贵金属 / 有色</option><option value="etf">ETF</option><option value="macro">宏观</option><option value="cotton">棉花</option><option value="agriculture">农产品</option></select></label>
+            <label><span>搜索</span><input id="uploadDfaLibrarySearch" type="search" placeholder="名称或分类" /></label>
+            <button id="refreshUploadDfaLibraryButton" type="button">刷新</button>
+          </div>
+          <div id="uploadDfaLibrary" class="upload-dfa-library"><div class="upload-library-empty">构建完成的 DFA 会按领域和分类保存在这里。</div></div>
+          <section id="uploadDfaPreview" class="upload-dfa-preview" hidden>
+            <header><div><span id="uploadDfaPreviewCategory">模板 DFA</span><strong id="uploadDfaPreviewName">未选择 DFA</strong></div><button id="closeUploadDfaPreviewButton" type="button">收起预览</button></header>
+            <div id="uploadDfaPreviewMetrics" class="upload-preview-metrics"></div>
+            <div class="upload-preview-canvas"><svg id="uploadDfaPreviewSvg" viewBox="0 0 900 440" role="img" aria-label="上传模板构建的 DFA"></svg></div>
+            <div id="uploadDfaPreviewFiles" class="upload-preview-files"></div>
+          </section>
+        </section>
+      </div>
+    </dialog>
+
+    <dialog id="myDfaModal" class="my-dfa-modal">
+      <header>
+        <div>
+          <span class="pane-kicker">User DFA Workspace</span>
+          <h2>我的 DFA</h2>
+          <p id="myDfaSummary">从系统垂类导入副本，自主调整段落状态与转移结构。</p>
+        </div>
+        <button id="closeMyDfaButton" class="icon-button" type="button" title="关闭" aria-label="关闭我的 DFA">×</button>
+      </header>
+      <div class="my-dfa-layout">
+        <aside class="my-dfa-library">
+          <section class="my-dfa-import">
+            <span>导入系统垂类</span>
+            <select id="myDfaDomainSelect" aria-label="选择要导入的垂类">
+              <option value="precious_metals">贵金属 / 有色</option>
+              <option value="etf">ETF</option>
+              <option value="macro">宏观</option>
+              <option value="cotton">棉花</option>
+              <option value="agriculture">农产品</option>
+            </select>
+            <button id="importMyDfaButton" type="button">导入为我的 DFA</button>
+            <small>导入创建独立副本，不修改系统训练模板。</small>
+          </section>
+          <section class="my-dfa-saved">
+            <div><strong>我的垂类结构</strong><span id="myDfaCount">0</span></div>
+            <div id="myDfaList" class="my-dfa-list"></div>
+          </section>
+        </aside>
+        <main class="my-dfa-main">
+          <div id="myDfaEmpty" class="my-dfa-empty">
+            <span>✦</span>
+            <strong>还没有用户 DFA</strong>
+            <p>从左侧选择一个系统垂类导入，即可开始构建自己的段落状态机。</p>
+          </div>
+          <section id="myDfaEditor" class="my-dfa-editor" hidden>
+            <header class="my-dfa-editor-toolbar">
+              <label><span>DFA 名称</span><input id="myDfaNameInput" type="text" maxlength="60" /></label>
+              <div>
+                <button id="addMyDfaNodeButton" type="button">＋ 添加段落</button>
+                <button id="saveMyDfaButton" class="primary" type="button">保存结构</button>
+                <button id="deleteMyDfaButton" class="danger" type="button">删除</button>
+              </div>
+            </header>
+            <div id="myDfaMetrics" class="my-dfa-metrics"></div>
+            <div class="my-dfa-workspace">
+              <div class="my-dfa-canvas">
+                <svg id="myDfaSvg" viewBox="0 0 980 560" role="img" aria-label="用户 DFA"></svg>
+              </div>
+              <aside class="my-dfa-inspector">
+                <section id="myDfaNodeEditor" class="my-dfa-node-editor"></section>
+                <section class="my-dfa-edge-editor">
+                  <header><strong>状态转移</strong><small id="myDfaEdgeCount">0 条</small></header>
+                  <div id="myDfaEdgeList" class="my-dfa-edge-list"></div>
+                  <div class="my-dfa-add-edge">
+                    <select id="myDfaEdgeSource" aria-label="转移起点"></select>
+                    <span>→</span>
+                    <select id="myDfaEdgeTarget" aria-label="转移终点"></select>
+                    <input id="myDfaEdgeCondition" type="text" maxlength="100" placeholder="转移条件，如：用户要求该段落" />
+                    <button id="addMyDfaEdgeButton" type="button">添加转移</button>
+                  </div>
+                </section>
+              </aside>
+            </div>
+          </section>
+        </main>
+      </div>
+      <p class="my-dfa-note">用户 DFA 保存在当前浏览器本机存储中；系统原始全局写作 DFA 始终保持只读并可重新导入。</p>
+    </dialog>
+
+    <script src="./pages-demo.js?v=20260910-sandbox-storage"></script>
+    <script src="./i18n.js?v=20260910-english-only-v2"></script>
+    <script src="./app.js?v=20260927-multi-provider-v3"></script>
+    <script>
+      (() => {
+        const cover = document.getElementById("landingCover");
+        const enterButton = document.getElementById("enterStudioButton");
+        if (!cover || !enterButton) return;
+        enterButton.addEventListener("click", () => {
+          cover.classList.add("is-leaving");
+          document.body.classList.remove("landing-active");
+          window.setTimeout(() => {
+            cover.hidden = true;
+            document.getElementById("queryInput")?.focus({ preventScroll: true });
+          }, 420);
+        });
+      })();
+    </script>
+  </body>
+</html>

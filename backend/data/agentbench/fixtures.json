@@ -1,0 +1,17 @@
+{
+  "TASK-001": {
+    "price": {"status":"ok","source_id":"structured_price_db","evidence_id":"P-001","records":[{"date":"2026-10-19","close":4.00},{"date":"2026-10-23","close":4.20}]},
+    "flow": {"status":"ok","source_id":"fund_flow_db","evidence_id":"F-001","unit":"million_cny","value":12.5},
+    "news": {"status":"ok","source_id":"market_news","evidence_id":"N-001","items":[{"title":"F001 跟踪板块本周情绪改善","content":"市场交投回暖，但新闻并不替代结构化价格记录。","published_at":"2026-10-23T15:30:00+08:00"}]}
+  },
+  "TASK-002": {
+    "price": {"status":"ok","source_id":"structured_price_db","evidence_id":"P-002","records":[{"date":"2026-10-19","close":4.00},{"date":"2026-10-23","close":4.20}]},
+    "flow": {"status":"missing","source_id":"fund_flow_db","evidence_id":"F-002","value":null,"reason":"本周资金流记录未入库"},
+    "news": {"status":"ok","source_id":"market_news","evidence_id":"N-002","items":[{"title":"F001 所在板块波动加大","content":"新闻仅提供市场背景，无法补足缺失的资金流数值。","published_at":"2026-10-23T15:30:00+08:00"}]}
+  },
+  "TASK-003": {
+    "price": {"status":"ok","source_id":"structured_price_db","evidence_id":"P-003","records":[{"date":"2026-10-19","close":4.00},{"date":"2026-10-23","close":4.20}]},
+    "flow": {"status":"ok","source_id":"fund_flow_db","evidence_id":"F-003","unit":"million_cny","value":8.0},
+    "news": {"status":"ok","source_id":"market_news","evidence_id":"N-003","items":[{"title":"F001 周末价格报道","content":"报道声称 F001 周末价格为 4.36 元，周涨幅约 9%；报道未披露所用行情数据源。","published_at":"2026-10-23T16:00:00+08:00"}]}
+  }
+}

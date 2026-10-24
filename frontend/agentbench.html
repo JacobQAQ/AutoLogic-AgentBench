@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoLogic-AgentBench V1</title>
+  <link rel="stylesheet" href="./agentbench.css" />
+  <script src="./agentbench.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">A<span>·</span>B</span><div><strong>AutoLogic<span> / AgentBench</span></strong><small>AGENT EVALUATION WORKSPACE</small></div></div>
+      <div class="top-right"><span class="version">V1 · LOCAL DEMO</span><a href="./index.html">返回 AutoLogic Studio ↗</a></div>
+    </header>
+    <main>
+      <section class="intro"><div class="eyebrow"><i></i> DEEPSEEK AGENT EVALUATION</div><h1>观察决策，核验结果<span>。</span></h1><p>三条固定金融任务 · 四个本地工具 · 真实 Function Calling 轨迹 · 独立规则评分</p><div class="model-line"><span>被测模型</span><strong id="modelName">DeepSeek V4.1 Flash</strong><code id="modelId">deepseek-flash</code><span>固定数据 · 非实时行情</span></div></section>
+      <div class="grid">
+        <section class="panel task-panel" aria-labelledby="tasksHeading"><div class="panel-head"><span class="section-no">01</span><div><h2 id="tasksHeading">Task Selection</h2><p>选择一条标准化评测任务</p></div></div><div id="taskCards" class="task-cards"><p class="muted">正在加载任务…</p></div><div id="taskDetail" class="task-detail"></div></section>
+        <section class="panel run-panel" aria-labelledby="runHeading"><div class="panel-head"><span class="section-no">02</span><div><h2 id="runHeading">Run Agent</h2><p>一次运行生成独立的执行记录</p></div></div><div class="run-body"><div class="run-meta"><span>PROVIDER</span><strong>DeepSeek</strong><span>MODE</span><strong>Non-thinking · Tool Calls</strong><span>MAX DECISIONS</span><strong>8</strong></div><button id="runButton" disabled>运行 DeepSeek Flash Agent <span>→</span></button><p id="runStatus" role="status" class="status-text">正在检查后端配置…</p></div></section>
+        <section class="panel trace-panel" aria-labelledby="traceHeading"><div class="panel-head"><span class="section-no">03</span><div><h2 id="traceHeading">Execution Trace</h2><p>模型决策、工具调用、结果与最终回答</p></div><span id="runId" class="run-id"></span></div><div id="traceList" class="trace-list empty-state">运行任务后，真实轨迹将在这里显示。</div></section>
+        <section class="panel result-panel" aria-labelledby="resultHeading"><div class="panel-head"><span class="section-no">04</span><div><h2 id="resultHeading">Evaluation Results</h2><p>硬性成功条件与诊断分数分开展示</p></div></div><div id="results" class="empty-state">等待运行结果。</div></section>
+      </div>
+    </main>
+    <footer>AutoLogic-AgentBench V1 <span>本页使用固定虚构 ETF F001 数据；结论不构成投资建议。</span></footer>
+  </div>
+</body>
+</html>

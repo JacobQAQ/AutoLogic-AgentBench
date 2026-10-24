@@ -1,0 +1,5 @@
+{
+  "TASK-001":{"price_start":4.0,"price_end":4.2,"price_source_id":"structured_price_db","news_claimed_close":null,"weekly_return_pct":5.0,"required_tools":["get_price_data","get_fund_flow","get_market_news","calculate"],"required_evidence":["P-001","F-001","N-001"],"fund_flow_status":"available","fund_flow_value":12.5,"conflict_detected":false},
+  "TASK-002":{"price_start":4.0,"price_end":4.2,"price_source_id":"structured_price_db","news_claimed_close":null,"weekly_return_pct":5.0,"required_tools":["get_price_data","get_fund_flow","calculate"],"required_evidence":["P-002","F-002"],"fund_flow_status":"missing","fund_flow_value":null,"conflict_detected":false},
+  "TASK-003":{"price_start":4.0,"price_end":4.2,"price_source_id":"structured_price_db","news_claimed_close":4.36,"news_claimed_return_pct":9.0,"weekly_return_pct":5.0,"required_tools":["get_price_data","get_market_news","calculate"],"required_evidence":["P-003","N-003"],"fund_flow_status":"not_requested","fund_flow_value":null,"fund_flow_value_if_queried":8.0,"conflict_detected":true}
+}
